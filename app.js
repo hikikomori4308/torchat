@@ -1,35 +1,62 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const nicknameForm = document.getElementById('nickname-form');
+    const nicknameInput = document.getElementById('nickname-input');
+    const nicknameContainer = document.getElementById('nickname-container');
+    const chatContainer = document.getElementById('chat-container');
     const messagesContainer = document.getElementById('messages');
     const chatForm = document.getElementById('chat-form');
     const messageInput = document.getElementById('message-input');
 
+    // Проверяем, есть ли уже сохранённый никнейм
+    const savedNickname = localStorage.getItem('nickname');
+    if (savedNickname) {
+        showChat();
+    }
+
+    // Обработчик формы для ввода никнейма
+    nicknameForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const nickname = nicknameInput.value;
+        if (nickname.trim()) {
+            localStorage.setItem('nickname', nickname);
+            showChat();
+        }
+    });
+
     // Загружаем сохранённые сообщения из LocalStorage
     const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
-    savedMessages.forEach(msg => appendMessage(msg));
+    savedMessages.forEach(msg => appendMessage(msg.nickname, msg.text));
+
+    // Функция для показа чата
+    function showChat() {
+        nicknameContainer.style.display = 'none';
+        chatContainer.style.display = 'flex';
+    }
 
     // Функция для добавления сообщения в чат
-    function appendMessage(message) {
+    function appendMessage(nickname, text) {
         const messageElement = document.createElement('div');
-        messageElement.textContent = message;
+        messageElement.textContent = `${nickname}: ${text}`;
         messagesContainer.appendChild(messageElement);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Обработчик отправки формы
+    // Обработчик отправки формы чата
     chatForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const message = messageInput.value;
-        if (message.trim()) {
-            appendMessage(message);
-            saveMessage(message);
+        const nickname = localStorage.getItem('nickname');
+        if (message.trim() && nickname) {
+            appendMessage(nickname, message);
+            saveMessage(nickname, message);
             messageInput.value = '';
         }
     });
 
     // Функция для сохранения сообщения в LocalStorage
-    function saveMessage(message) {
+    function saveMessage(nickname, text) {
         const messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
-        messages.push(message);
+        messages.push({ nickname, text });
         localStorage.setItem('chatMessages', JSON.stringify(messages));
     }
 });
