@@ -29,8 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция для показа чата
     function showChat() {
-        nicknameContainer.style.display = 'none';
-        chatContainer.style.display = 'flex';
+        nicknameContainer.style.display = 'none'; // Скрываем ввод никнейма
+        chatContainer.style.display = 'flex'; // Отображаем чат
+
+        // Если у нас уже есть сохранённый никнейм, отображаем его
+        const nickname = localStorage.getItem('nickname');
+        if (nickname) {
+            alert(`Добро пожаловать, ${nickname}!`);
+        }
     }
 
     // Функция для добавления сообщения в чат
